@@ -86,8 +86,10 @@ jobs:
           script: |
             cd foodgram-project-react/infra
             sudo docker-compose stop
-            sudo docker-compose rm backend
-            sudo docker-compose rm frontend
+            sudo docker container prune
+            # sudo docker image prune -a
+            # sudo docker-compose rm backend
+            # sudo docker-compose rm frontend
             touch .env
             echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
             echo DB_NAME=${{ secrets.DB_NAME }} >> .env

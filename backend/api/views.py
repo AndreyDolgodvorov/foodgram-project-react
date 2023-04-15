@@ -1,24 +1,20 @@
-from django.conf import settings
-from django.contrib.auth.tokens import default_token_generator
-from django.core.mail import send_mail
-from django.db import IntegrityError
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.serializers import SetPasswordSerializer
-from rest_framework import viewsets, filters, mixins, response
-from rest_framework import permissions, status, views
+from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.decorators import action, api_view
-from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
 
-from .serializers import (TagSerializer, IngredientSerializer, RecipeReadSerializer,
-                          RecipeWriteSerializer, FavoriteSerializer, ShoppingCartSerializer,
+from .serializers import (TagSerializer, IngredientSerializer,
+                          RecipeReadSerializer, RecipeWriteSerializer,
+                          FavoriteSerializer, ShoppingCartSerializer,
                           UserSerializer, FollowSerializer)
-from recipes.models import (Tag, Ingredient, Recipe, RecipeIngredient, Favorite, ShoppingCart)
+from recipes.models import (Tag, Ingredient, Recipe,
+                            RecipeIngredient, Favorite, ShoppingCart)
 from users.models import Follow
 from .permissions import (IsOwnerOrAdminOrReadOnly,
                           IsCurrentUserOrAdminOrReadOnly)
@@ -54,7 +50,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if self.request.method in SAFE_METHODS:
             return RecipeReadSerializer
         return RecipeWriteSerializer
-    
+
     @action(detail=True,
             methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
@@ -121,6 +117,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             'ingredient__name', 'ingredient__measurement_unit'
         ).annotate(
             amounts=Sum('amount', distinct=True)).order_by('amount')
+        shopping_list = []
         for ingredient in ingredients:
             shopping_list += (
                 f'{ingredient["ingredient__name"]} - '

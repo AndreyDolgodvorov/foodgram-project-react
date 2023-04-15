@@ -3,7 +3,8 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from drf_extra_fields.fields import Base64ImageField
 
-from recipes.models import (Tag, Ingredient, Recipe, RecipeIngredient, ShoppingCart, Favorite)
+from recipes.models import (Tag, Ingredient, Recipe,
+                            RecipeIngredient, ShoppingCart, Favorite)
 from users.models import Follow
 
 from django.contrib.auth import get_user_model
@@ -83,20 +84,22 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'tags', 'author', 'ingredients',
             'is_favorited', 'is_in_shopping_cart',
-            'name', 'image', 'text', 'cooking_time'             
+            'name', 'image', 'text', 'cooking_time'
         )
 
     def get_is_favorited(self, instance):
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
-        return Recipe.objects.filter(favorites__user=user, id=instance.id).exists()
+        return Recipe.objects.filter(favorite__user=user,
+                                     id=instance.id).exists()
 
     def get_is_in_shopping_cart(self, instance):
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
-        return Recipe.objects.filter(cart__user=user, id=instance.id).exists()
+        return Recipe.objects.filter(cart__user=user,
+                                     id=instance.id).exists()
 
 
 class AddIngredientSerializer(serializers.ModelSerializer):
@@ -211,7 +214,8 @@ class FollowSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
-        return Follow.objects.filter(user=instance.user, author=instance.author).exists()
+        return Follow.objects.filter(user=instance.user,
+                                     author=instance.author).exists()
 
     def get_recipes(self, instance):
         request = self.context.get('request')

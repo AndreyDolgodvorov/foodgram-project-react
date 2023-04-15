@@ -23,7 +23,3 @@ class IsCurrentUserOrAdminOrReadOnly(permissions.BasePermission):
             or obj == request.user
             or request.user.is_superuser
         )
-
-    
-
-

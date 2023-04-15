@@ -1,14 +1,12 @@
-from rest_framework import serializers
-from rest_framework import status
-from rest_framework.exceptions import ValidationError
+from django.contrib.auth import get_user_model
 from drf_extra_fields.fields import Base64ImageField
+from rest_framework import status
+from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from recipes.models import (Tag, Ingredient, Recipe,
                             RecipeIngredient, ShoppingCart, Favorite)
 from users.models import Follow
-
-from django.contrib.auth import get_user_model
-
 
 User = get_user_model()
 

@@ -8,7 +8,7 @@ services:
       - ./.env
 
   frontend:
-    image: andreydolgodvorov/frontend:latest
+    image: andreydolgodvorov/foodgram_frontend:latest
     restart: always
     volumes:
       - ../frontend/:/app/result_build/
@@ -16,9 +16,7 @@ services:
       - db
 
   backend:
-    build:
-      context: ../backend
-      dockerfile: Dockerfile
+    image: andreydolgodvorov/foodgram_backend:latest
     restart: always
     volumes:
       - static_value:/app/static/

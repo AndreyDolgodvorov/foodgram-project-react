@@ -24,8 +24,8 @@ class IngredientsInline(admin.TabularInline):
 
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ('id', 'author', 'name', 'pub_date', 'count_favorite',)
-    list_filter = ('name', 'author__username', 'tags__name',)
-    search_fields = ('name', 'author__username', 'tags__name',)
+    list_filter = ('name', 'author', 'tags',)
+    search_fields = ('name', 'author', 'tags',)
     readonly_fields = ('favorite',)
     inlines = [IngredientsInline]
 
@@ -36,21 +36,21 @@ class RecipeAdmin(admin.ModelAdmin):
 
 
 class FavoriteAdmin(admin.ModelAdmin):
-    list_display = ('user__username', 'recipe__name')
-    list_filter = ('user__username',)
-    search_fields = ('user__username',)
+    list_display = ('user', 'recipe')
+    list_filter = ('user',)
+    search_fields = ('user',)
 
 
 class ShoppingCartAdmin(admin.ModelAdmin):
-    list_display = ('user__username', 'recipe__name')
-    list_filter = ('user__username',)
+    list_display = ('user', 'recipe')
+    list_filter = ('user',)
     search_fields = ('author',)
 
 
 class RecipeIngredientAdmin(admin.ModelAdmin):
-    list_display = ('id', 'recipe__name', 'ingredient__name', 'amount',)
-    list_filter = ('recipe__name', 'ingredient__name')
-    search_fields = ('recipe__name',)
+    list_display = ('id', 'recipe', 'ingredient', 'amount',)
+    list_filter = ('recipe', 'ingredient')
+    search_fields = ('recipe',)
 
 
 admin.site.register(Ingredient, IngredientAdmin)

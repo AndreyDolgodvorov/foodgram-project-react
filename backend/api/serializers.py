@@ -3,7 +3,6 @@ from drf_extra_fields.fields import Base64ImageField
 from rest_framework import status
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-
 from recipes.models import (Tag, Ingredient, Recipe,
                             RecipeIngredient, ShoppingCart, Favorite)
 from users.models import Follow
@@ -25,7 +24,8 @@ class UserSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, instance):
         user = self.context.get('request').user
         if not user.is_anonymous:
-            return Follow.objects.filter(user=user, author=instance).exists()
+            return Follow.objects.filter(user=user,
+                                         author=instance).exists()
 
     def create(self, validated_data):
         user = User(

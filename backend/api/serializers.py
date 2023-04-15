@@ -26,6 +26,7 @@ class UserSerializer(serializers.ModelSerializer):
         if not user.is_anonymous:
             return Follow.objects.filter(user=user,
                                          author=instance).exists()
+        return False
 
     def create(self, validated_data):
         user = User(

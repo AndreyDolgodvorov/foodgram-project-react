@@ -175,7 +175,7 @@ class ShoppingCart(models.Model):
         on_delete=models.CASCADE,
         verbose_name='рецепт'
     )
-    user = models.ForeignKey(
+    author = models.ForeignKey(
         User,
         related_name='shopping_cart',
         on_delete=models.CASCADE,
@@ -186,8 +186,8 @@ class ShoppingCart(models.Model):
         verbose_name = 'Список покупок'
         constraints = [
             models.UniqueConstraint(
-                fields=['recipe', 'user'],
+                fields=['recipe', 'author'],
                 name='unique_ShopCart')]
 
     def __str__(self):
-        return f'{self.recipe} {self.user}'
+        return f'{self.recipe} {self.author}'

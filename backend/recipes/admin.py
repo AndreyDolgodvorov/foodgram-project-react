@@ -42,9 +42,9 @@ class FavoriteAdmin(admin.ModelAdmin):
 
 
 class ShoppingCartAdmin(admin.ModelAdmin):
-    list_display = ('author', 'recipe')
-    list_filter = ('author',)
-    search_fields = ('author',)
+    list_display = ('user', 'recipe')
+    list_filter = ('user',)
+    search_fields = ('user',)
 
 
 class RecipeIngredientAdmin(admin.ModelAdmin):

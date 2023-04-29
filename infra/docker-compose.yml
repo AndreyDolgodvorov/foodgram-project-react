@@ -8,15 +8,16 @@ services:
       - ./.env
 
   frontend:
-    image: andreydolgodvorov/foodgram_frontend:latest
-    restart: always
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
     volumes:
       - ../frontend/:/app/result_build/
-    depends_on:
-      - db
 
   backend:
-    image: andreydolgodvorov/foodgram_backend:latest
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
     restart: always
     volumes:
       - static_value:/app/static/

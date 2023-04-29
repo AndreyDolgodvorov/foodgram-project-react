@@ -104,6 +104,7 @@ class Recipe(models.Model):
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(
         Recipe,
+        related_name='recipe_ingredients',
         on_delete=models.CASCADE,
         verbose_name='рецепт'
     )
@@ -175,7 +176,7 @@ class ShoppingCart(models.Model):
         on_delete=models.CASCADE,
         verbose_name='рецепт'
     )
-    author = models.ForeignKey(
+    user = models.ForeignKey(
         User,
         related_name='shopping_cart',
         on_delete=models.CASCADE,
@@ -186,8 +187,8 @@ class ShoppingCart(models.Model):
         verbose_name = 'Список покупок'
         constraints = [
             models.UniqueConstraint(
-                fields=['recipe', 'author'],
+                fields=['recipe', 'user'],
                 name='unique_ShopCart')]
 
     def __str__(self):
-        return f'{self.recipe} {self.author}'
+        return f'{self.recipe} {self.user}'

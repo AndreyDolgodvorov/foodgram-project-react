@@ -6,17 +6,16 @@ User = get_user_model()
 
 
 class Tag(models.Model):
-
-    YELLOW = '#FFFF00'
-    RED = '#FF0000'
-    GREEN = '#00B050'
-
+    ORANGE = '#FDD041'
+    RED = '#F56B6B'
+    GREEN = '#19C57F'
+    PINK = '#ED8FE4'
     COLOR_CHOICES = [
-        (YELLOW, 'Желтый'),
+        (ORANGE, 'Оранжевый'),
         (RED, 'Красный'),
-        (GREEN, 'Зеленый')
+        (GREEN, 'Зеленый'),
+        (PINK, 'Розовый'),
     ]
-
     name = models.CharField(
         'Название',
         max_length=200,
@@ -36,7 +35,7 @@ class Tag(models.Model):
     )
 
     class Meta:
-        ordering = ('name',)
+        ordering = ('id',)
         verbose_name = "Тег"
         verbose_name_plural = "Теги"
 
@@ -119,6 +118,7 @@ class RecipeIngredient(models.Model):
     )
 
     class Meta:
+        verbose_name_plural = 'Ингридиенты рецептов'
         constraints = [
             models.UniqueConstraint(
                 fields=['recipe', 'ingredient'],
@@ -159,7 +159,7 @@ class Favorite(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Список избранного'
+        verbose_name_plural = 'Список избранного'
         constraints = [
             models.UniqueConstraint(
                 fields=['recipe', 'user'],
@@ -184,7 +184,7 @@ class ShoppingCart(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Список покупок'
+        verbose_name_plural = 'Список покупок'
         constraints = [
             models.UniqueConstraint(
                 fields=['recipe', 'user'],

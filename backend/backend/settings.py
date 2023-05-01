@@ -26,7 +26,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', default='secret_key')
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '158.160.17.244',
+    '158.160.66.42',
     '127.0.0.1',
     'web',
     'localhost',
@@ -98,12 +98,6 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT', default='5432')
     }
 }
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -172,6 +166,6 @@ DJOSER = {
     },
 }
 
-AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'users.CustomUser'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'

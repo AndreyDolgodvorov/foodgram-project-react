@@ -1,10 +1,8 @@
 from base64 import b64decode
+
 from django.core.files.base import ContentFile
 from django.contrib.auth import get_user_model
-# from drf_extra_fields.fields import Base64ImageField
-from rest_framework import status
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 from recipes.models import (Tag, Ingredient, Recipe,
                             RecipeIngredient, ShoppingCart, Favorite)
 from users.models import Follow
@@ -29,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             'email', 'id', 'username', 'first_name',
-            'last_name', 'is_subscribed',)
+            'last_name', 'is_subscribed', 'password',)
         extra_kwargs = {'password': {'write_only': True}}
         read_only_fields = ('is_subscribed',)
 
@@ -40,19 +38,16 @@ class UserSerializer(serializers.ModelSerializer):
                                          author=instance).exists()
         return False
 
-    # def create(self, validated_data):
-    #     user = User(
-    #         email=validated_data['email'],
-    #         username=validated_data['username'],
-    #         first_name=validated_data['first_name'],
-    #         last_name=validated_data['last_name'],
-    #     )
-    #     user.set_password(validated_data['password'])
-    #     user.save()
-    #     return user
-
     def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
+        user = User(
+            email=validated_data['email'],
+            username=validated_data['username'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -212,50 +207,14 @@ class FavoriteSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'image', 'coocking_time',)
 
 
-class FollowSerializer(serializers.ModelSerializer):
-    email = serializers.ReadOnlyField(source='author.email')
-    id = serializers.ReadOnlyField(source='author.id')
-    username = serializers.ReadOnlyField(source='author.username')
-    first_name = serializers.ReadOnlyField(source='author.first_name')
-    last_name = serializers.ReadOnlyField(source='author.last_name')
-    is_subscribed = serializers.SerializerMethodField()
-    recipes = serializers.SerializerMethodField()
+class FollowSerializer(UserSerializer):
+    recipes = ShortRecipeSerializer(many=True, read_only=True)
     recipes_count = serializers.SerializerMethodField()
 
     class Meta:
-        model = Follow
+        model = User
         fields = ('email', 'id', 'username', 'first_name',
                   'last_name', 'is_subscribed', 'recipes', 'recipes_count',)
 
-    def get_is_subscribed(self, instance):
-        user = self.context.get('request').user
-        if user.is_anonymous:
-            return False
-        return Follow.objects.filter(user=instance.user,
-                                     author=instance.author).exists()
-
-    def get_recipes(self, instance):
-        request = self.context.get('request')
-        limit = request.GET.get('recipes_limit')
-        recipes = Recipe.objects.filter(author=instance.author)
-        if limit and limit.isdigit():
-            recipes = recipes[:int(limit)]
-        return ShortRecipeSerializer(recipes, many=True).data
-
     def get_recipes_count(self, instance):
-        return Recipe.objects.filter(author=instance.author).count()
-
-    def validate(self, data):
-        author = self.context.get('author')
-        user = self.context.get('request').user
-        if Follow.objects.filter(
-                author=author,
-                user=user).exists():
-            raise ValidationError(
-                detail='Вы уже подписаны на этого пользователя!',
-                code=status.HTTP_400_BAD_REQUEST)
-        if user == author:
-            raise ValidationError(
-                detail='Невозможно подписаться на себя!',
-                code=status.HTTP_400_BAD_REQUEST)
-        return data
+        return instance.recipes.count()

@@ -2,25 +2,15 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-class User(AbstractUser):
-    USER = 'user'
-    ADMIN = 'admin'
-    USER_ROLE = [
-        (USER, 'пользователь'),
-        (ADMIN, 'администратор')
-    ]
-    username = models.CharField(
-        'Логин',
-        max_length=150,
-        unique=True
-    )
-    password = models.CharField(
-        'Пароль',
-        max_length=150
-    )
+class CustomUser(AbstractUser):
     email = models.EmailField(
         'Электронная почта',
         max_length=254,
+        unique=True
+    )
+    username = models.CharField(
+        'Логин',
+        max_length=150,
         unique=True
     )
     first_name = models.CharField(
@@ -31,15 +21,19 @@ class User(AbstractUser):
         'Фамилия пользователя',
         max_length=150
     )
-    role = models.CharField(
-        max_length=10,
-        choices=USER_ROLE,
-        default=USER
+    password = models.CharField(
+        'Пароль',
+        max_length=150
+    )
+    is_active = models.BooleanField(
+        'Активирован',
+        default=True,
     )
 
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+        ordering = ('username',)
         constraints = [
             models.UniqueConstraint(
                 fields=['username', 'email'],
@@ -50,20 +44,16 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
-    @property
-    def is_admin(self):
-        return self.role == self.ADMIN
-
 
 class Follow(models.Model):
     user = models.ForeignKey(
-        User,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='follower',
         verbose_name='Подписчик'
     )
     author = models.ForeignKey(
-        User,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='following',
         verbose_name='Автор'

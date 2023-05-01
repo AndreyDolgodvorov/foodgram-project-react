@@ -163,7 +163,7 @@ class UserViewSet(DjoserUserViewSet):
             Follow.objects.create(user=user, author=author)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        if request.method == 'DELETE':
+        elif request.method == 'DELETE':
             if Follow.objects.filter(author=author, user=user).exists():
                 Follow.objects.filter(author=author, user=user).delete()
                 return Response('Подписка удалена',

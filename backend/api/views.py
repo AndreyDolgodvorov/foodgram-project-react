@@ -163,13 +163,12 @@ class UserViewSet(DjoserUserViewSet):
             Follow.objects.create(user=user, author=author)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        elif request.method == 'DELETE':
-            if Follow.objects.filter(author=author, user=user).exists():
-                Follow.objects.filter(author=author, user=user).delete()
-                return Response('Подписка удалена',
-                                status=status.HTTP_204_NO_CONTENT)
-            return Response({'error': 'Вы не подписаны на этого пользователя'},
-                            status=status.HTTP_400_BAD_REQUEST)
+        if Follow.objects.filter(author=author, user=user).exists():
+            Follow.objects.filter(author=author, user=user).delete()
+            return Response('Подписка удалена',
+                            status=status.HTTP_204_NO_CONTENT)
+        return Response({'error': 'Вы не подписаны на этого пользователя'},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False,
             methods=['GET'],

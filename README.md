@@ -18,7 +18,7 @@ curl -fsSL https://get.docker.com -o get-docker.sh
 sh get-docker.sh
 sudo apt-get install docker-compose-plugin
 ```
-3. Перейти в каталог "infra" и создайте файл .env по шаблону:
+3. Перейти в каталог "infra" и создать файл .env по шаблону:
 ```
 DB_ENGINE=django.db.backends.postgresql
 DB_NAME=postgres

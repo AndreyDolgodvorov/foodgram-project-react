@@ -109,12 +109,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def favorite(self, request, **kwargs):
         if self.request.method == 'POST':
-            return self.del_recipe(Favorite, FavoriteSerializer)
+            return self.add_recipe(Favorite, FavoriteSerializer)
         return self.del_recipe(Favorite)
 
     def shopping_cart(self, request, **kwargs):
         if self.request.method == 'POST':
-            return self.del_recipe(ShoppingCart, ShoppingCartSerializer)
+            return self.add_recipe(ShoppingCart, ShoppingCartSerializer)
         return self.del_recipe(ShoppingCart)
 
     @action(detail=False,

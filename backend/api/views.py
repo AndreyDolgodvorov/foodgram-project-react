@@ -52,40 +52,70 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeReadSerializer
         return RecipeWriteSerializer
 
-    def add_del_recipe(self, model, serializer_class):
+    # def add_del_recipe(self, model, serializer_class):
+    #     recipe = get_object_or_404(Recipe, id=self.kwargs.get('pk'))
+    #     user = self.request.user
+    #     if self.request.method == 'POST':
+    #         if model.objects.filter(user=user,
+    #                                 recipe=recipe).exists():
+    #             return Response({'errors': 'Рецепт уже добавлен.'},
+    #                             status=status.HTTP_400_BAD_REQUEST)
+    #         serializer = serializer_class(data=self.request.data)
+    #         if serializer.is_valid(raise_exception=True):
+    #             serializer.save(user=user, recipe=recipe)
+    #             return Response(serializer.data,
+    #                             status=status.HTTP_201_CREATED)
+    #         return Response(serializer.errors,
+    #                         status=status.HTTP_400_BAD_REQUEST)
+    #     if not model.objects.filter(user=user,
+    #                                 recipe=recipe).exists():
+    #         return Response({'errors': 'Рецепт не найден.'},
+    #                         status=status.HTTP_404_NOT_FOUND)
+    #     model.objects.get(recipe=recipe).delete()
+    #     return Response('Рецепт удалён из избранного.',
+    #                     status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True,
+            methods=['POST'],
+            permission_classes=[IsAuthenticated])
+    def add_recipe(self, model, serializer_class):
         recipe = get_object_or_404(Recipe, id=self.kwargs.get('pk'))
         user = self.request.user
-        if self.request.method == 'POST':
-            if model.objects.filter(user=user,
-                                    recipe=recipe).exists():
-                return Response({'errors': 'Рецепт уже добавлен.'},
-                                status=status.HTTP_400_BAD_REQUEST)
-            serializer = serializer_class(data=self.request.data)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save(user=user, recipe=recipe)
-                return Response(serializer.data,
-                                status=status.HTTP_201_CREATED)
-            return Response(serializer.errors,
+        if model.objects.filter(user=user,
+                                recipe=recipe).exists():
+            return Response({'errors': 'Рецепт уже добавлен.'},
                             status=status.HTTP_400_BAD_REQUEST)
+        serializer = serializer_class(data=self.request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(user=user, recipe=recipe)
+            return Response(serializer.data,
+                            status=status.HTTP_201_CREATED)
+        return Response(serializer.errors,
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True,
+            methods=['DELETE'],
+            permission_classes=[IsAuthenticated])
+    def del_recipe(self, model):
+        recipe = get_object_or_404(Recipe, id=self.kwargs.get('pk'))
+        user = self.request.user
         if not model.objects.filter(user=user,
                                     recipe=recipe).exists():
             return Response({'errors': 'Рецепт не найден.'},
                             status=status.HTTP_404_NOT_FOUND)
         model.objects.get(recipe=recipe).delete()
-        return Response('Рецепт удалён из избранного.',
+        return Response('Рецепт удалён.',
                         status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=True,
-            methods=['post', 'delete'],
-            permission_classes=[IsAuthenticated])
     def favorite(self, request, **kwargs):
-        return self.add_del_recipe(Favorite, FavoriteSerializer)
-
-    @action(detail=True,
-            methods=['post', 'delete'],
-            permission_classes=[IsAuthenticated])
+        if self.request.method == 'POST':
+            return self.del_recipe(Favorite, FavoriteSerializer)
+        return self.del_recipe(Favorite)
+        
     def shopping_cart(self, request, **kwargs):
-        return self.add_del_recipe(ShoppingCart, ShoppingCartSerializer)
+        if self.request.method == 'POST':
+            return self.del_recipe(ShoppingCart, ShoppingCartSerializer)
+        return self.del_recipe(ShoppingCart)
 
     @action(detail=False,
             methods=['get'],

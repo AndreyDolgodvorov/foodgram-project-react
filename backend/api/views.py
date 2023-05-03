@@ -52,29 +52,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeReadSerializer
         return RecipeWriteSerializer
 
-    # def add_del_recipe(self, model, serializer_class):
-    #     recipe = get_object_or_404(Recipe, id=self.kwargs.get('pk'))
-    #     user = self.request.user
-    #     if self.request.method == 'POST':
-    #         if model.objects.filter(user=user,
-    #                                 recipe=recipe).exists():
-    #             return Response({'errors': 'Рецепт уже добавлен.'},
-    #                             status=status.HTTP_400_BAD_REQUEST)
-    #         serializer = serializer_class(data=self.request.data)
-    #         if serializer.is_valid(raise_exception=True):
-    #             serializer.save(user=user, recipe=recipe)
-    #             return Response(serializer.data,
-    #                             status=status.HTTP_201_CREATED)
-    #         return Response(serializer.errors,
-    #                         status=status.HTTP_400_BAD_REQUEST)
-    #     if not model.objects.filter(user=user,
-    #                                 recipe=recipe).exists():
-    #         return Response({'errors': 'Рецепт не найден.'},
-    #                         status=status.HTTP_404_NOT_FOUND)
-    #     model.objects.get(recipe=recipe).delete()
-    #     return Response('Рецепт удалён из избранного.',
-    #                     status=status.HTTP_204_NO_CONTENT)
-
     @action(detail=True,
             methods=['POST'],
             permission_classes=[IsAuthenticated])
@@ -118,7 +95,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return self.del_recipe(ShoppingCart)
 
     @action(detail=False,
-            methods=['get'],
+            methods=['GET'],
             permission_classes=[IsAuthenticated])
     def download_shopping_cart(self, request):
         user = self.request.user
@@ -153,7 +130,7 @@ class UserViewSet(DjoserUserViewSet):
     permission_classes = (IsCurrentUserOrAdminOrReadOnly, )
     pagination_class = CustomPagination
 
-    @action(methods=['get'],
+    @action(methods=['GET'],
             detail=False,
             permission_classes=[IsAuthenticated])
     def me(self, request):
@@ -176,29 +153,36 @@ class UserViewSet(DjoserUserViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True,
-            methods=['POST', 'DELETE'],
+            methods=['POST'],
             permission_classes=[IsAuthenticated])
-    def subscribe(self, request, id):
-        user = request.user
-        author = get_object_or_404(User, id=id)
+    def add_subscription(self, request, user, author):
+        if Follow.objects.filter(author=author, user=user).exists():
+            return Response({'error': 'Вы уже подписаны'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        if user == author:
+            return Response({'error': 'Невозможно подписаться на себя'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        serializer = FollowSerializer(author, context={'request': request})
+        Follow.objects.create(user=user, author=author)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        if request.method == 'POST':
-            if Follow.objects.filter(author=author, user=user).exists():
-                return Response({'error': 'Вы уже подписаны'},
-                                status=status.HTTP_400_BAD_REQUEST)
-            if user == author:
-                return Response({'error': 'Невозможно подписаться на себя'},
-                                status=status.HTTP_400_BAD_REQUEST)
-            serializer = FollowSerializer(author, context={'request': request})
-            Follow.objects.create(user=user, author=author)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
+    @action(detail=True,
+            methods=['DELETE'],
+            permission_classes=[IsAuthenticated])
+    def del_subscription(self, user, author):
         if Follow.objects.filter(author=author, user=user).exists():
             Follow.objects.filter(author=author, user=user).delete()
             return Response('Подписка удалена',
                             status=status.HTTP_204_NO_CONTENT)
         return Response({'error': 'Вы не подписаны на этого пользователя'},
                         status=status.HTTP_400_BAD_REQUEST)
+
+    def subscribe(self, request, id):
+        user = request.user
+        author = get_object_or_404(User, id=id)
+        if self.request.method == 'POST':
+            return self.add_subscription(request, user, author)
+        return self.del_subscription(user, author)
 
     @action(detail=False,
             methods=['GET'],

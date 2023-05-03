@@ -111,7 +111,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if self.request.method == 'POST':
             return self.del_recipe(Favorite, FavoriteSerializer)
         return self.del_recipe(Favorite)
-        
+
     def shopping_cart(self, request, **kwargs):
         if self.request.method == 'POST':
             return self.del_recipe(ShoppingCart, ShoppingCartSerializer)

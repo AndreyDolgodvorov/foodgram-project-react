@@ -50,7 +50,7 @@ sudo docker-compose exec -T backend python manage.py loaddata fixtures.json
 ___email/пароль тестовых пользователей:___\
 _vpupkin@yandex.ru/pupkin_\
 _emedvedev@yandex.ru/medvedev_\
-_avolkova@yandex.ru/volkova_\
+_avolkova@yandex.ru/volkova_
 
 ### Админ зона
 http://food-gram.zapto.org/admin

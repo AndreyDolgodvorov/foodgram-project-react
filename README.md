@@ -57,6 +57,17 @@ http://food-gram.zapto.org/admin
 
 _логин/пароль superuser: admin/admin_
 
+<<<<<<< HEAD
+=======
+___email/пароль тестовых пользователей:___
+_vpupkin@yandex.ru/pupkin_
+
+_emedvedev@yandex.ru/medvedev_
+
+_avolkova@yandex.ru/volkova_
+>>>>>>> 245d93c95ee9fdcc80ce480fcb772d50c884a957
+
+Проект запущен и доступен по адресу: food-gram.zapto.org
 
 ## Технологии
 * Python 3.7

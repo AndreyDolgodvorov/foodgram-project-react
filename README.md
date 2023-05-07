@@ -51,6 +51,7 @@ _vpupkin@yandex.ru/pupkin_
 _emedvedev@yandex.ru/medvedev_
 _avolkova@yandex.ru/volkova_
 
+
 ## Технологии
 * Python 3.7
 * Django 2.2.16

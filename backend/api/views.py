@@ -74,7 +74,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                                     recipe=recipe).exists():
             return Response({'errors': 'Рецепт не найден.'},
                             status=status.HTTP_404_NOT_FOUND)
-        model.objects.get(recipe=recipe).delete()
+        model.objects.filter(recipe=recipe).delete()
         return Response('Рецепт удалён.',
                         status=status.HTTP_204_NO_CONTENT)
 

@@ -46,7 +46,7 @@ sudo docker-compose exec -T backend python manage.py loaddata fixtures.json
 ___В тестовой БД:___
 _логин/пароль superuser: admin/admin_
 
-___email/пароль тестовых пользователей:___
+___email/пароль тестовых пользователей: /n___
 _vpupkin@yandex.ru/pupkin_
 _emedvedev@yandex.ru/medvedev_
 _avolkova@yandex.ru/volkova_

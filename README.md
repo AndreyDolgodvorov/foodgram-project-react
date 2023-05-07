@@ -43,8 +43,13 @@ sudo docker-compose exec -T backend python manage.py import_from_csv
 ```
 sudo docker-compose exec -T backend python manage.py loaddata fixtures.json
 ```
-_логин/пароль для superuser в тестовой БД: admin/admin_
+___В тестовой БД:___
+_логин/пароль superuser: admin/admin_
 
+___email/пароль тестовых пользователей:___
+_vpupkin@yandex.ru/pupkin_
+_emedvedev@yandex.ru/medvedev_
+_avolkova@yandex.ru/volkova_
 
 ## Технологии
 * Python 3.7

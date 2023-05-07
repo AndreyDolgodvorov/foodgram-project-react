@@ -52,9 +52,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeReadSerializer
         return RecipeWriteSerializer
 
-    @action(detail=True,
-            methods=['POST'],
-            permission_classes=[IsAuthenticated])
     def add_recipe(self, model, serializer_class):
         recipe = get_object_or_404(Recipe, id=self.kwargs.get('pk'))
         user = self.request.user
@@ -70,10 +67,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors,
                         status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True,
-            methods=['DELETE'],
-            permission_classes=[IsAuthenticated])
-    def del_recipe(self, model):
+    def delete_recipe(self, model):
         recipe = get_object_or_404(Recipe, id=self.kwargs.get('pk'))
         user = self.request.user
         if not model.objects.filter(user=user,
@@ -84,15 +78,25 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Response('Рецепт удалён.',
                         status=status.HTTP_204_NO_CONTENT)
 
+    @action(detail=True,
+            methods=['POST'],
+            permission_classes=[IsAuthenticated])
     def favorite(self, request, **kwargs):
-        if self.request.method == 'POST':
-            return self.add_recipe(Favorite, FavoriteSerializer)
-        return self.del_recipe(Favorite)
+        return self.add_recipe(Favorite, FavoriteSerializer)
 
+    @favorite.mapping.delete
+    def delete_favorite(self, request, **kwargs):
+        return self.delete_recipe(Favorite)
+
+    @action(detail=True,
+            methods=['POST'],
+            permission_classes=[IsAuthenticated])
     def shopping_cart(self, request, **kwargs):
-        if self.request.method == 'POST':
-            return self.add_recipe(ShoppingCart, ShoppingCartSerializer)
-        return self.del_recipe(ShoppingCart)
+        return self.add_recipe(ShoppingCart, ShoppingCartSerializer)
+
+    @shopping_cart.mapping.delete
+    def delete_shopping_cart(self, request, **kwargs):
+        return self.delete_recipe(ShoppingCart)
 
     @action(detail=False,
             methods=['GET'],
@@ -155,7 +159,9 @@ class UserViewSet(DjoserUserViewSet):
     @action(detail=True,
             methods=['POST'],
             permission_classes=[IsAuthenticated])
-    def add_subscription(self, request, user, author):
+    def subscribe(self, request, id):
+        user = request.user
+        author = get_object_or_404(User, id=id)
         if Follow.objects.filter(author=author, user=user).exists():
             return Response({'error': 'Вы уже подписаны'},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -166,23 +172,16 @@ class UserViewSet(DjoserUserViewSet):
         Follow.objects.create(user=user, author=author)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    @action(detail=True,
-            methods=['DELETE'],
-            permission_classes=[IsAuthenticated])
-    def del_subscription(self, user, author):
+    @subscribe.mapping.delete
+    def delete_subscribe(self, request, id):
+        user = request.user
+        author = get_object_or_404(User, id=id)
         if Follow.objects.filter(author=author, user=user).exists():
             Follow.objects.filter(author=author, user=user).delete()
             return Response('Подписка удалена',
                             status=status.HTTP_204_NO_CONTENT)
         return Response({'error': 'Вы не подписаны на этого пользователя'},
                         status=status.HTTP_400_BAD_REQUEST)
-
-    def subscribe(self, request, id):
-        user = request.user
-        author = get_object_or_404(User, id=id)
-        if self.request.method == 'POST':
-            return self.add_subscription(request, user, author)
-        return self.del_subscription(user, author)
 
     @action(detail=False,
             methods=['GET'],
